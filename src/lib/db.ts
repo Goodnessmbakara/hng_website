@@ -344,6 +344,71 @@ export async function getOrderById(id: string): Promise<Order | null> {
 }
 
 /**
+ * Fetch orders optionally filtered by user email
+ */
+export async function getOrders(userEmail?: string): Promise<Order[]> {
+  const sql = getSql();
+  if (!sql) {
+    if (userEmail) {
+      return inMemoryOrders.filter(o => o.customerEmail.toLowerCase() === userEmail.toLowerCase());
+    }
+    return inMemoryOrders;
+  }
+
+  try {
+    let orderRows;
+    if (userEmail) {
+      orderRows = await sql`
+        SELECT * FROM orders 
+        WHERE LOWER(customer_email) = LOWER(${userEmail})
+        ORDER BY created_at DESC 
+        LIMIT 20;
+      `;
+    } else {
+      orderRows = await sql`SELECT * FROM orders ORDER BY created_at DESC LIMIT 20;`;
+    }
+
+    const orders: Order[] = [];
+    for (const r of orderRows) {
+      const itemsRows = await sql`SELECT * FROM order_items WHERE order_id = ${r.id};`;
+      const items: OrderItem[] = itemsRows.map((it: any) => ({
+        id: String(it.id),
+        orderId: it.order_id,
+        productId: it.product_id,
+        productName: it.product_name,
+        unitPrice: parseFloat(it.unit_price),
+        quantity: parseInt(it.quantity, 10),
+        totalPrice: parseFloat(it.total_price),
+        imageUrl: it.image_url || undefined,
+      }));
+
+      orders.push({
+        id: r.id,
+        orderNumber: r.order_number,
+        userId: r.user_id,
+        customerName: r.customer_name,
+        customerEmail: r.customer_email,
+        shippingAddress: typeof r.shipping_address === 'string' ? JSON.parse(r.shipping_address) : r.shipping_address,
+        items,
+        subtotal: parseFloat(r.subtotal),
+        shippingFee: parseFloat(r.shipping_fee),
+        tax: parseFloat(r.tax),
+        total: parseFloat(r.total),
+        status: r.status,
+        paymentStatus: r.payment_status,
+        mailgunStatus: r.mailgun_status,
+        createdAt: r.created_at,
+      });
+    }
+
+    return orders;
+  } catch (error) {
+    console.error('Error fetching orders from Neon:', error);
+    return inMemoryOrders;
+  }
+}
+
+/**
  * Sync user profile upon Google OAuth login
  */
 export async function syncUserProfile(user: {
