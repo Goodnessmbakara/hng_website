@@ -1,0 +1,11 @@
+# Mobile app (React Native / Expo)
+mobile/
+mobile/**
+
+# Development scripts
+scripts/
+
+# Git & Logs
+.git
+.github
+*.log
