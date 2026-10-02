@@ -1,9 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import SessionProviderWrapper from '@/components/SessionProviderWrapper';
 import { CartProvider } from '@/context/CartContext';
 import CartDrawer from '@/components/CartDrawer';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import Footer from '@/components/Footer';
 
 const geistSans = Geist({
@@ -15,6 +16,14 @@ const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: '#0f172a',
+};
 
 export const metadata: Metadata = {
   title: 'TechHaven — Premium Tech & Modern Gadgets Shop',
@@ -31,7 +40,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 md:pb-0">
         <SessionProviderWrapper>
           <CartProvider>
             <div className="flex min-h-screen flex-col">
@@ -39,6 +48,7 @@ export default function RootLayout({
               <Footer />
             </div>
             <CartDrawer />
+            <MobileBottomNav />
           </CartProvider>
         </SessionProviderWrapper>
       </body>

@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
 import { getProducts } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-user-id',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -8,9 +20,12 @@ export async function GET(request: Request) {
     const search = searchParams.get('search') || undefined;
 
     const products = await getProducts(category, search);
-    return NextResponse.json({ success: true, products });
+    return NextResponse.json({ success: true, products }, { headers: corsHeaders });
   } catch (error: any) {
     console.error('Error fetching products:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }

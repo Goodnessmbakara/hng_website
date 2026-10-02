@@ -29,8 +29,8 @@ export default function OrdersPage() {
     <>
       <Header />
 
-      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 flex-1">
-        <div className="mb-6">
+      <main className="mx-auto max-w-5xl px-3.5 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1">
+        <div className="mb-4 sm:mb-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors"
@@ -40,12 +40,12 @@ export default function OrdersPage() {
           </Link>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Order History
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Live orders persisted in Neon Serverless PostgreSQL.
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function OrdersPage() {
             <p className="mt-4 text-xs font-semibold text-slate-500">Querying orders from Neon DB...</p>
           </div>
         ) : orders.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-12 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 mb-4">
               <ShoppingBag className="h-8 w-8" />
             </div>
@@ -71,20 +71,21 @@ export default function OrdersPage() {
             </p>
             <Link
               href="/"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow hover:bg-blue-500 transition-all"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow hover:bg-blue-500 transition-all active:scale-95"
             >
               Browse Catalog
             </Link>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {orders.map((order) => (
               <div
                 key={order.id}
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
               >
                 {/* Header */}
-                <div className="bg-slate-50/80 dark:bg-slate-800/50 p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs">
+                <div className="bg-slate-50/80 dark:bg-slate-800/50 p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-between gap-3 sm:gap-4 text-xs">
+
                   <div className="space-y-1">
                     <span className="text-slate-400 font-medium">Order Number</span>
                     <div className="font-mono font-bold text-slate-900 dark:text-white text-sm">
@@ -113,24 +114,24 @@ export default function OrdersPage() {
                     </div>
                   </div>
 
-                  {/* Mailgun Status Badge */}
+                  {/* Resend Status Badge */}
                   <div className="space-y-1">
-                    <span className="text-slate-400 font-medium">Mailgun Status</span>
+                    <span className="text-slate-400 font-medium">Resend Status</span>
                     <div>
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                          order.mailgunStatus === 'sent'
+                          order.resendStatus === 'sent'
                             ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                            : order.mailgunStatus === 'failed'
+                            : order.resendStatus === 'failed'
                             ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
                             : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
                         }`}
                       >
                         <Mail className="h-3 w-3" />
-                        {order.mailgunStatus === 'sent'
+                        {order.resendStatus === 'sent'
                           ? 'Email Delivered'
-                          : order.mailgunStatus === 'failed'
-                          ? 'Sandbox / Failed'
+                          : order.resendStatus === 'failed'
+                          ? 'Failed'
                           : 'Simulated'}
                       </span>
                     </div>

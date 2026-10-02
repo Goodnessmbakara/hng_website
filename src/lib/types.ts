@@ -54,9 +54,10 @@ export interface Order {
   total: number;
   status: 'pending' | 'processing' | 'completed' | 'cancelled';
   paymentStatus: 'paid' | 'pending' | 'failed';
-  mailgunStatus?: 'sent' | 'simulated' | 'failed' | 'pending';
+  resendStatus?: 'sent' | 'simulated' | 'failed' | 'pending';
   createdAt: string;
 }
+
 
 export interface CheckoutFormData {
   fullName: string;
@@ -78,6 +79,16 @@ export interface UserProfile {
   email: string;
   name?: string | null;
   image?: string | null;
+  emailVerified?: boolean;
   createdAt?: string;
   lastLoginAt?: string;
 }
+
+export interface UserRecord extends UserProfile {
+  passwordHash?: string | null;
+  verificationToken?: string | null;
+  verificationTokenExpires?: string | null;
+  resetToken?: string | null;
+  resetTokenExpires?: string | null;
+}
+

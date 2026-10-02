@@ -33,12 +33,12 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 dark:bg-red-950 text-red-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-950 text-violet-600">
               <Mail className="h-5 w-5" />
             </div>
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                Mailgun Delivery API
+                Resend Delivery API
               </h4>
               <p className="text-xs text-slate-500">Instant HTML receipts to your inbox</p>
             </div>
@@ -56,7 +56,7 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-1">
-            <span>Powered by Next.js 15, Neon, Google Auth & Mailgun</span>
+            <span>Powered by Next.js 15, Neon, Google Auth & Resend</span>
           </div>
         </div>
 

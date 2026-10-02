@@ -3,7 +3,7 @@
 import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle2, Mail, ArrowRight, ShieldCheck, ShoppingBag, Terminal } from 'lucide-react';
+import { CheckCircle2, Mail, ShieldCheck, ShoppingBag } from 'lucide-react';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -31,7 +31,7 @@ function SuccessContent() {
           Thank you for your order!
         </h1>
         <p className="mt-3 text-sm text-slate-500 max-w-md mx-auto">
-          Hey {name}, your order has been received and saved to the database. We're getting your tech gear ready.
+          Hey {name}, your order has been received and saved to the database. We&apos;re getting your tech gear ready.
         </p>
 
         {/* Order Details Badge */}
@@ -56,7 +56,7 @@ function SuccessContent() {
           </div>
         </div>
 
-        {/* Mailgun Delivery Status Card */}
+        {/* Resend Delivery Status Card */}
         <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-5 dark:border-blue-900/40 dark:bg-blue-950/30 text-left">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white flex-shrink-0">
@@ -65,7 +65,7 @@ function SuccessContent() {
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                  Mailgun Email Dispatch
+                  Resend Email Dispatch
                 </h4>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   emailStatus === 'sent'
@@ -77,22 +77,22 @@ function SuccessContent() {
                   {emailStatus === 'sent'
                     ? 'LIVE DELIVERED'
                     : emailStatus === 'failed'
-                    ? 'MAILGUN NOTIFICATION'
+                    ? 'RESEND NOTIFICATION'
                     : 'SIMULATED'}
                 </span>
               </div>
               <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 {emailStatus === 'sent' ? (
                   <>
-                    A branded HTML receipt and order summary has been delivered via <strong>Mailgun API</strong> to <strong>{email}</strong>.
+                    A branded HTML receipt and order summary has been delivered via <strong>Resend API</strong> to <strong>{email}</strong>.
                   </>
                 ) : emailStatus === 'failed' ? (
                   <>
-                    Order successfully persisted in <strong>Neon PostgreSQL</strong>. Note: Mailgun Sandbox domains only allow outbound emails to <em>Authorized Recipients</em>. To receive live emails at <strong>{email}</strong>, add this address under <strong>Mailgun Dashboard → Sending → Domains → Authorized Recipients</strong>.
+                    Order successfully persisted in <strong>Neon PostgreSQL</strong>. Note: Resend requires an active API key and a verified sending domain to deliver outbound emails to <strong>{email}</strong>.
                   </>
                 ) : (
                   <>
-                    Order confirmation generated and logged. To trigger live outbound delivery to real inboxes, configure your <code>MAILGUN_API_KEY</code> and <code>MAILGUN_DOMAIN</code> in <code>.env.local</code>.
+                    Order confirmation generated and logged. To trigger live outbound delivery to real inboxes, configure your <code>RESEND_API_KEY</code> in <code>.env.local</code>.
                   </>
                 )}
               </p>

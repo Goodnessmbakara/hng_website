@@ -1,7 +1,19 @@
 import { NextResponse } from 'next/server';
-import { saveOrder, updateOrderMailgunStatus } from '@/lib/db';
-import { sendOrderConfirmationEmail } from '@/lib/mailgun';
+import { saveOrder, updateOrderResendStatus } from '@/lib/db';
+import { sendOrderConfirmationEmail } from '@/lib/resend';
 import { Order, OrderItem, ShippingAddress } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-user-id',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 200, headers: corsHeaders });
+}
 
 export async function POST(request: Request) {
   try {
@@ -57,7 +69,7 @@ export async function POST(request: Request) {
       total,
       status: 'completed',
       paymentStatus: 'paid',
-      mailgunStatus: 'pending',
+      resendStatus: 'pending',
       createdAt: new Date().toISOString(),
     };
 
@@ -65,27 +77,31 @@ export async function POST(request: Request) {
     console.log(`💾 Persisting order #${order.orderNumber} to database...`);
     const dbResult = await saveOrder(order);
 
-    // 2. Dispatch Confirmation Email via Mailgun API
-    console.log(`✉️ Dispatching order confirmation email to ${order.customerEmail} via Mailgun...`);
+    // 2. Dispatch Confirmation Email via Resend API
+    console.log(`✉️ Dispatching order confirmation email to ${order.customerEmail} via Resend...`);
     const mailResult = await sendOrderConfirmationEmail(order);
 
-    // 3. Update Mailgun status in database
-    await updateOrderMailgunStatus(order.id, mailResult.status);
-    order.mailgunStatus = mailResult.status;
+    // 3. Update Resend status in database
+    await updateOrderResendStatus(order.id, mailResult.status);
+    order.resendStatus = mailResult.status;
 
-    return NextResponse.json({
-      success: true,
-      order,
-      emailDelivery: {
-        status: mailResult.status,
-        messageId: mailResult.messageId,
+    return NextResponse.json(
+      {
+        success: true,
+        order,
+        emailDelivery: {
+          status: mailResult.status,
+          messageId: mailResult.messageId,
+        },
       },
-    });
+      { headers: corsHeaders }
+    );
   } catch (error: any) {
     console.error('Checkout processing error:', error);
     return NextResponse.json(
       { error: error?.message || 'An unexpected error occurred during checkout.' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
+
 }

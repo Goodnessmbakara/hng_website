@@ -1,6 +1,6 @@
 # ⚡ TechHaven — Modern Tech & Gadgets E-Commerce Store
 
-TechHaven is a full-featured e-commerce platform built for high-performance audio, computing, wearables, and mechanical peripherals. It includes a complete storefront, cart management, checkout flow, database persistence with **Neon PostgreSQL**, email notifications powered by **Mailgun**, and Google Single Sign-On via **Google Cloud Console OAuth 2.0**.
+TechHaven is a full-featured e-commerce platform built for high-performance audio, computing, wearables, and mechanical peripherals. It includes a complete storefront, cart management, checkout flow, database persistence with **Neon PostgreSQL**, email notifications powered by **Resend**, and Google Single Sign-On via **Google Cloud Console OAuth 2.0**.
 
 ---
 
@@ -24,8 +24,8 @@ TechHaven is a full-featured e-commerce platform built for high-performance audi
   * Atomic order placement and inventory stock decrementing.
   * Automatic table schema creation and product seeding endpoint (`/api/seed`).
   * Seamless local fallback when `DATABASE_URL` is not yet configured.
-* **Email Confirmation (Mailgun API)**:
-  * Transactional email dispatched on order placement via `mailgun.js`.
+* **Email Confirmation (Resend API)**:
+  * Transactional email dispatched on order placement via `resend`.
   * Polished, responsive HTML receipt containing order reference, itemized breakdown, customer address, and total amount.
   * Development simulation fallback when API keys are not yet configured.
 * **Google Authentication (Google Cloud Console)**:
@@ -38,7 +38,7 @@ TechHaven is a full-featured e-commerce platform built for high-performance audi
 
 * **Frontend**: Next.js 15 (App Router, React 19, TypeScript, Tailwind CSS, Lucide Icons)
 * **Database**: Neon Serverless PostgreSQL (`@neondatabase/serverless`)
-* **Email Delivery**: Mailgun API (`mailgun.js` + `form-data`)
+* **Email Delivery**: Resend API (`resend`)
 * **Authentication**: NextAuth.js (Auth.js) with Google Provider
 
 ---
@@ -82,15 +82,13 @@ Open `.env.local` and add your service credentials:
    NEXTAUTH_URL="http://localhost:3000"
    ```
 
-#### C. Mailgun API (`MAILGUN_API_KEY`, `MAILGUN_DOMAIN`)
-1. Sign up or log into [Mailgun](https://app.mailgun.com).
-2. Retrieve your **Sending Domain** (sandbox or verified custom domain) and **Private API Key**.
+#### C. Resend API (`RESEND_API_KEY`)
+1. Sign up or log into [Resend](https://resend.com).
+2. Retrieve your **API Key** from API Keys.
 3. Add to `.env.local`:
    ```env
-   MAILGUN_API_KEY="your-mailgun-api-key"
-   MAILGUN_DOMAIN="sandbox-xxx.mailgun.org"
-   MAILGUN_HOST="api.mailgun.net"
-   MAILGUN_FROM_EMAIL="TechHaven Orders <orders@your-domain.mailgun.org>"
+   RESEND_API_KEY="your-resend-api-key"
+   RESEND_FROM_EMAIL="TechHaven Orders <orders@yourdomain.com>"
    ```
 
 ---
@@ -109,4 +107,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 1. **Browse & Cart**: Add tech gear from the home page catalog to your cart.
 2. **Google Sign-In**: Click "Google Sign In" in the header to authenticate.
 3. **Checkout**: Click "Proceed to Checkout" or navigate to `/checkout`. Your name and email will be pre-filled from your Google account.
-4. **Order Confirmation**: Click "Place Order". The order will be saved to Neon, Mailgun will trigger the confirmation email receipt, and you will be routed to the confirmation success screen (`/checkout/success`).
+4. **Order Confirmation**: Click "Place Order". The order will be saved to Neon, Resend will trigger the confirmation email receipt, and you will be routed to the confirmation success screen (`/checkout/success`).

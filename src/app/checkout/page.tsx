@@ -243,7 +243,7 @@ export default function CheckoutPage() {
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1 flex items-center justify-between">
-                  <span>Email Address (for Mailgun Confirmation Receipt) *</span>
+                  <span>Email Address (for Resend Confirmation Receipt) *</span>
                   <Mail className="h-3.5 w-3.5 text-blue-600" />
                 </label>
                 <input
@@ -256,7 +256,7 @@ export default function CheckoutPage() {
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-slate-800 dark:bg-slate-800 dark:text-white"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Your official order confirmation & tracking details will be emailed here via Mailgun.
+                  Your official order confirmation & tracking details will be emailed here via Resend.
                 </p>
               </div>
 
@@ -525,7 +525,7 @@ export default function CheckoutPage() {
               <span>•</span>
               <div className="flex items-center gap-1">
                 <Mail className="h-3.5 w-3.5 text-blue-500" />
-                <span>Instant Mailgun Receipt</span>
+                <span>Instant Resend Receipt</span>
               </div>
             </div>
 

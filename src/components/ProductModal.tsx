@@ -28,7 +28,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
@@ -36,12 +36,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 rounded-full bg-white/80 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white backdrop-blur-sm transition-colors"
+          className="absolute right-3 top-3 z-20 rounded-full bg-white/90 p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:bg-slate-800/90 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white backdrop-blur-sm transition-colors shadow-sm"
+          aria-label="Close modal"
         >
           <X className="h-5 w-5" />
         </button>
@@ -49,8 +50,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         <div className="grid grid-cols-1 md:grid-cols-2">
           
           {/* Image Gallery */}
-          <div className="relative aspect-square md:aspect-auto md:h-full bg-slate-100 dark:bg-slate-800 p-6 flex items-center justify-center">
-            <div className="relative h-64 w-64 md:h-80 md:w-80 overflow-hidden rounded-2xl">
+          <div className="relative aspect-[4/3] sm:aspect-square md:aspect-auto md:h-full bg-slate-100 dark:bg-slate-800 p-4 sm:p-6 flex items-center justify-center">
+            <div className="relative h-48 w-48 sm:h-64 sm:w-64 md:h-80 md:w-80 overflow-hidden rounded-2xl">
               <Image
                 src={product.imageUrl}
                 alt={product.name}
@@ -61,14 +62,15 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               />
             </div>
             {product.badge && (
-              <span className="absolute left-6 top-6 rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white shadow-md">
+              <span className="absolute left-4 top-4 sm:left-6 sm:top-6 rounded-full bg-blue-600 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-bold text-white shadow-md">
                 {product.badge}
               </span>
             )}
           </div>
 
           {/* Details */}
-          <div className="p-6 md:p-8 flex flex-col justify-between">
+          <div className="p-4 sm:p-6 md:p-8 flex flex-col justify-between">
+
             <div>
               {/* Category & Rating */}
               <div className="flex items-center justify-between">
