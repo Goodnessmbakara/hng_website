@@ -16,9 +16,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Search, Star, ShoppingBag, Plus, Check, Info, X } from 'lucide-react-native';
+import { Search, Star, ShoppingBag, Plus, Check, Info, X, AlertTriangle, RefreshCw, Settings } from 'lucide-react-native';
 import { Product } from '../types';
 import { apiRequest } from '../api/client';
+import { getApiUrl } from '../config';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -28,6 +29,7 @@ export default function ShopScreen({ navigation }: any) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -50,12 +52,16 @@ export default function ShopScreen({ navigation }: any) {
         endpoint += `?${params.join('&')}`;
       }
 
-      const res = await apiRequest<{ success: boolean; products: Product[] }>(endpoint);
+      const res = await apiRequest<{ success: boolean; products: Product[]; error?: string }>(endpoint);
       if (res.success && Array.isArray(res.data?.products)) {
         setProducts(res.data.products);
+        setFetchError(null);
+      } else {
+        setFetchError(res.error || 'Failed to fetch catalog from API server');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to load products:', e);
+      setFetchError(e?.message || 'Network connection failed');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -220,6 +226,43 @@ export default function ShopScreen({ navigation }: any) {
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#2563EB" />
           <Text style={styles.loadingText}>Loading TechHaven catalog...</Text>
+        </View>
+      ) : fetchError && products.length === 0 ? (
+        <View style={styles.centerContainer}>
+          <View style={styles.errorIconBg}>
+            <AlertTriangle size={36} color="#EF4444" />
+          </View>
+          <Text style={styles.errorTitle}>Cannot Connect to API Server</Text>
+          <Text style={styles.errorEndpoint}>
+            Target: {getApiUrl()}/api/products
+          </Text>
+          <Text style={styles.errorDetail}>{fetchError}</Text>
+          <Text style={styles.errorHint}>
+            Make sure &quot;npm run dev&quot; is running on your Mac and your phone is connected to the same Wi-Fi network.
+          </Text>
+
+          <View style={styles.errorActionsRow}>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={() => {
+                setLoading(true);
+                fetchProducts();
+              }}
+              activeOpacity={0.8}
+            >
+              <RefreshCw size={15} color="#FFFFFF" style={{ marginRight: 6 }} />
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() => navigation?.navigate('Profile')}
+              activeOpacity={0.8}
+            >
+              <Settings size={15} color="#2563EB" style={{ marginRight: 6 }} />
+              <Text style={styles.settingsButtonText}>Server IP</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       ) : products.length === 0 ? (
         <View style={styles.centerContainer}>
@@ -640,4 +683,78 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
+  errorIconBg: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  errorTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  errorEndpoint: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    color: '#2563EB',
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+  errorDetail: {
+    fontSize: 12,
+    color: '#DC2626',
+    textAlign: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  errorHint: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+  },
+  errorActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  settingsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+  },
+  settingsButtonText: {
+    color: '#2563EB',
+    fontWeight: '700',
+    fontSize: 13,
+  },
 });
+
