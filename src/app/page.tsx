@@ -4,28 +4,51 @@ import React, { useState, useMemo } from 'react';
 import Header from '@/components/Header';
 import ProductCard from '@/components/ProductCard';
 import ProductModal from '@/components/ProductModal';
-import { INITIAL_PRODUCTS, CATEGORIES } from '@/lib/products-data';
 import { Product } from '@/lib/types';
-import { Sparkles, ArrowRight, ShieldCheck, Zap, Laptop, Headphones, Watch, Filter } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Zap, Laptop, Headphones, Watch, Filter, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>(['All']);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [activeModalProduct, setActiveModalProduct] = useState<Product | null>(null);
 
-  // Fetch live products from Neon PostgreSQL
-  React.useEffect(() => {
+  const fetchLiveProducts = React.useCallback(() => {
+    setLoading(true);
+    setError(null);
     fetch('/api/products')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
-        if (data.success && Array.isArray(data.products) && data.products.length > 0) {
+        if (data.success && Array.isArray(data.products)) {
           setProducts(data.products);
+          if (Array.isArray(data.categories) && data.categories.length > 0) {
+            setCategories(data.categories);
+          } else {
+            const dynamic = ['All', ...Array.from(new Set(data.products.map((p: Product) => p.category))) as string[]];
+            setCategories(dynamic);
+          }
+        } else {
+          setError(data.error || 'Failed to retrieve products from database');
         }
       })
-      .catch((err) => console.log('Using initial products cache:', err));
+      .catch((err) => {
+        console.error('Failed to load products from database:', err);
+        setError('Unable to connect to database. Please check connection.');
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  // Fetch live products from Neon PostgreSQL
+  React.useEffect(() => {
+    fetchLiveProducts();
+  }, [fetchLiveProducts]);
 
   // Filter products by category and search
   const filteredProducts = useMemo(() => {
@@ -123,7 +146,7 @@ export default function HomePage() {
 
             {/* Category Filter Pills - Touch horizontal scroll */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0 no-scrollbar touch-scroll">
-              {CATEGORIES.map((cat) => {
+              {categories.map((cat) => {
                 const isActive = selectedCategory === cat;
                 return (
                   <button
@@ -142,8 +165,47 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Product Grid - 2 columns on mobile, 4 columns on large desktop */}
-          {filteredProducts.length === 0 ? (
+          {/* Product Grid State Handling */}
+          {loading ? (
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/60 p-3 sm:p-4 animate-pulse flex flex-col justify-between h-[320px]"
+                >
+                  <div className="w-full h-36 bg-slate-200 dark:bg-slate-800 rounded-xl mb-3" />
+                  <div className="space-y-2">
+                    <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+                    <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded" />
+                    <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-800 rounded" />
+                  </div>
+                  <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+                    <div className="h-8 w-8 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error && products.length === 0 ? (
+            <div className="py-16 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-950/40 text-red-600">
+                <AlertCircle className="h-7 w-7" />
+              </div>
+              <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
+                Unable to load products from database
+              </h3>
+              <p className="mt-1 text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+                {error}
+              </p>
+              <button
+                onClick={fetchLiveProducts}
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-blue-500 active:scale-95"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Retry Live Fetch
+              </button>
+            </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="py-16 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400">
                 <Filter className="h-7 w-7" />

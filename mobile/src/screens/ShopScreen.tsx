@@ -23,10 +23,9 @@ import { getApiUrl } from '../config';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
-const CATEGORIES = ['All', 'Audio', 'Laptops', 'Wearables', 'Accessories', 'Drones', 'Gaming'];
-
 export default function ShopScreen({ navigation }: any) {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>(['All']);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -52,10 +51,16 @@ export default function ShopScreen({ navigation }: any) {
         endpoint += `?${params.join('&')}`;
       }
 
-      const res = await apiRequest<{ success: boolean; products: Product[]; error?: string }>(endpoint);
+      const res = await apiRequest<{ success: boolean; products: Product[]; categories?: string[]; error?: string }>(endpoint);
       if (res.success && Array.isArray(res.data?.products)) {
         setProducts(res.data.products);
         setFetchError(null);
+        if (Array.isArray(res.data.categories) && res.data.categories.length > 0) {
+          setCategories(res.data.categories);
+        } else {
+          const dynamicCats = ['All', ...Array.from(new Set(res.data.products.map((p) => p.category)))];
+          setCategories(dynamicCats);
+        }
       } else {
         setFetchError(res.error || 'Failed to fetch catalog from API server');
       }
@@ -199,7 +204,7 @@ export default function ShopScreen({ navigation }: any) {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoriesScroll}
         >
-          {CATEGORIES.map((cat) => {
+          {categories.map((cat) => {
             const isSelected = selectedCategory === cat;
             return (
               <TouchableOpacity

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProducts } from '@/lib/db';
+import { getProducts, getCategories } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +19,15 @@ export async function GET(request: Request) {
     const category = searchParams.get('category') || undefined;
     const search = searchParams.get('search') || undefined;
 
-    const products = await getProducts(category, search);
-    return NextResponse.json({ success: true, products }, { headers: corsHeaders });
+    const [products, categories] = await Promise.all([
+      getProducts(category, search),
+      getCategories(),
+    ]);
+
+    return NextResponse.json(
+      { success: true, products, categories },
+      { headers: corsHeaders }
+    );
   } catch (error: any) {
     console.error('Error fetching products:', error);
     return NextResponse.json(

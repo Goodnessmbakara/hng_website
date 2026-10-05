@@ -256,7 +256,25 @@ export async function getProducts(category?: string, query?: string): Promise<Pr
     }));
   } catch (error) {
     console.error('Error fetching products from Neon:', error);
-    return inMemoryProducts;
+    throw new Error(error instanceof Error ? error.message : 'Database query failed');
+  }
+}
+
+/**
+ * Fetch distinct product categories from the database
+ */
+export async function getCategories(): Promise<string[]> {
+  const sql = getSql();
+  if (!sql) {
+    throw new Error('Database connection not configured');
+  }
+
+  try {
+    const rows = await sql`SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category ASC;`;
+    return ['All', ...rows.map((r: any) => r.category)];
+  } catch (error) {
+    console.error('Error fetching categories from Neon:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to load categories');
   }
 }
 
