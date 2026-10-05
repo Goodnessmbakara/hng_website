@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleGoogleToken = async (idToken: string) => {
     setIsLoading(true);
     try {
-      const result = await apiRequest('/api/auth/mobile', {
+      const result = await apiRequest('/api/mobile-auth', {
         method: 'POST',
         body: JSON.stringify({
           provider: 'google',
@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      const result = await apiRequest('/api/auth/mobile', {
+      const result = await apiRequest('/api/mobile-auth', {
         method: 'POST',
         body: JSON.stringify({
           provider: 'account',

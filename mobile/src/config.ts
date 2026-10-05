@@ -1,9 +1,9 @@
 import * as SecureStore from 'expo-secure-store';
 
-// Default local Wi-Fi development endpoint of the Next.js server
-export const DEFAULT_API_URL = 'http://192.168.1.111:3000';
+// Default live production endpoint of the Next.js server
+export const DEFAULT_API_URL = 'https://hngwebsite.vercel.app';
 
-const API_STORAGE_KEY = 'techhaven_api_url_v1';
+const API_STORAGE_KEY = 'techhaven_api_url_v2';
 
 let currentApiUrl = DEFAULT_API_URL;
 

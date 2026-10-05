@@ -23,26 +23,33 @@ export async function POST(request: Request) {
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: 'Cannot checkout with an empty cart.' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
     if (!shippingAddress || !shippingAddress.email || !shippingAddress.fullName || !shippingAddress.address) {
       return NextResponse.json(
         { error: 'Please provide complete shipping details including name, address and email.' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
-    // Calculate totals
-    const orderItems: OrderItem[] = items.map((item: any) => ({
-      productId: item.product.id,
-      productName: item.product.name,
-      unitPrice: Number(item.product.price),
-      quantity: Number(item.quantity),
-      totalPrice: Number(item.product.price) * Number(item.quantity),
-      imageUrl: item.product.imageUrl,
-    }));
+    // Calculate totals - support both { product: Product, quantity } and { productId, productName, unitPrice, quantity }
+    const orderItems: OrderItem[] = items.map((item: any) => {
+      const prodId = item.product?.id || item.productId || 'prod-unknown';
+      const prodName = item.product?.name || item.productName || 'Tech Gadget';
+      const price = Number(item.product?.price ?? item.unitPrice ?? 0);
+      const qty = Number(item.quantity || 1);
+      const img = item.product?.imageUrl || item.imageUrl || '';
+      return {
+        productId: prodId,
+        productName: prodName,
+        unitPrice: price,
+        quantity: qty,
+        totalPrice: price * qty,
+        imageUrl: img,
+      };
+    });
 
     const subtotal = orderItems.reduce((acc, curr) => acc + curr.totalPrice, 0);
     const shippingFee = subtotal >= 150 ? 0 : 9.99;

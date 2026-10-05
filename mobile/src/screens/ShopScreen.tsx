@@ -243,7 +243,7 @@ export default function ShopScreen({ navigation }: any) {
           </Text>
           <Text style={styles.errorDetail}>{fetchError}</Text>
           <Text style={styles.errorHint}>
-            Make sure &quot;npm run dev&quot; is running on your Mac and your phone is connected to the same Wi-Fi network.
+            Please check your internet connection to reach the live TechHaven API.
           </Text>
 
           <View style={styles.errorActionsRow}>
